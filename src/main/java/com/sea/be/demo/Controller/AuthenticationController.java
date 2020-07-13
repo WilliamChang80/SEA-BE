@@ -39,7 +39,7 @@ public class AuthenticationController {
         this.userService = userService;
     }
 
-    @PostMapping("/authenticate")
+    @PostMapping("/login")
     public BaseResponse createAuthenticationToken(@RequestBody AuthenticationRequest authenticationRequest)
             throws Exception {
         try {
