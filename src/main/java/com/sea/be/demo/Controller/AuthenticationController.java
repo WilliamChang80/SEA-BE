@@ -1,6 +1,5 @@
 package com.sea.be.demo.Controller;
 
-import com.sea.be.demo.Config.CustomUserDetailService;
 import com.sea.be.demo.Config.JwtUtil;
 import com.sea.be.demo.Dto.AuthenticationRequest;
 import com.sea.be.demo.Dto.AuthenticationResponse;
@@ -9,13 +8,10 @@ import com.sea.be.demo.Entity.User;
 import com.sea.be.demo.Enum.HttpResponse;
 import com.sea.be.demo.Service.UserService;
 import org.springframework.beans.factory.annotation.Autowired;
-import org.springframework.http.HttpStatus;
-import org.springframework.http.ResponseEntity;
 import org.springframework.security.authentication.AuthenticationManager;
 import org.springframework.security.authentication.BadCredentialsException;
 import org.springframework.security.authentication.UsernamePasswordAuthenticationToken;
 import org.springframework.security.core.userdetails.UserDetails;
-import org.springframework.security.core.userdetails.UserDetailsService;
 import org.springframework.web.bind.annotation.*;
 
 @RestController
@@ -24,17 +20,14 @@ public class AuthenticationController {
 
     private AuthenticationManager authenticationManager;
 
-    private CustomUserDetailService userDetailService;
-
     private JwtUtil jwtUtil;
 
     private UserService userService;
 
     @Autowired
-    public AuthenticationController(AuthenticationManager authenticationManager, CustomUserDetailService
-            userDetailsService, JwtUtil jwtUtil, UserService userService) {
+    public AuthenticationController(AuthenticationManager authenticationManager, JwtUtil jwtUtil,
+                                    UserService userService) {
         this.authenticationManager = authenticationManager;
-        this.userDetailService = userDetailsService;
         this.jwtUtil = jwtUtil;
         this.userService = userService;
     }
@@ -43,14 +36,15 @@ public class AuthenticationController {
     public BaseResponse createAuthenticationToken(@RequestBody AuthenticationRequest authenticationRequest)
             throws Exception {
         try {
-            authenticationManager.authenticate(new UsernamePasswordAuthenticationToken(authenticationRequest
-                    .getUserName(),
-                    authenticationRequest.getPassword()));
+            if (!userService.isValidLoginCredentials(authenticationRequest.getUserName(),
+                    authenticationRequest.getPassword())) {
+                throw new BadCredentialsException("Username and password not match !");
+            }
         } catch (BadCredentialsException e) {
-            throw new Exception("Username and password not match !", e);
+            return BaseResponse.builder().code(HttpResponse.UNAUTHORIZED.getCode()).message(e.getMessage()).build();
         }
-        final UserDetails userDetails = userDetailService.loadUserByUsername(authenticationRequest.getUserName());
-        final String jwt = jwtUtil.generateToken(userDetails);
+        UserDetails userDetails = userService.loadUserByUsername(authenticationRequest.getUserName());
+        String jwt = jwtUtil.generateToken(userDetails);
         BaseResponse response = BaseResponse.builder().code(HttpResponse.SUCCESS.getCode()).message("Success").data(
                 AuthenticationResponse.builder().token(jwt).build()).build();
         return response;

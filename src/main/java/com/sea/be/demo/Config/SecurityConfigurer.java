@@ -1,6 +1,7 @@
 package com.sea.be.demo.Config;
 
 import com.sea.be.demo.Filter.JwtRequestFilter;
+import com.sea.be.demo.Service.UserService;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.context.annotation.Bean;
 import org.springframework.security.authentication.AuthenticationManager;
@@ -9,7 +10,6 @@ import org.springframework.security.config.annotation.web.builders.HttpSecurity;
 import org.springframework.security.config.annotation.web.configuration.EnableWebSecurity;
 import org.springframework.security.config.annotation.web.configuration.WebSecurityConfigurerAdapter;
 import org.springframework.security.config.http.SessionCreationPolicy;
-import org.springframework.security.core.userdetails.UserDetailsService;
 import org.springframework.security.crypto.password.NoOpPasswordEncoder;
 import org.springframework.security.crypto.password.PasswordEncoder;
 import org.springframework.security.web.authentication.UsernamePasswordAuthenticationFilter;
@@ -17,19 +17,19 @@ import org.springframework.security.web.authentication.UsernamePasswordAuthentic
 @EnableWebSecurity
 public class SecurityConfigurer extends WebSecurityConfigurerAdapter {
 
-    private CustomUserDetailService customUserDetailService;
+    private UserService userService;
 
     private JwtRequestFilter jwtRequestFilter;
 
     @Autowired
-    public SecurityConfigurer(CustomUserDetailService customUserDetailService, JwtRequestFilter jwtRequestFilter) {
-        this.customUserDetailService = customUserDetailService;
+    public SecurityConfigurer(UserService userService, JwtRequestFilter jwtRequestFilter) {
+        this.userService = userService;
         this.jwtRequestFilter = jwtRequestFilter;
     }
 
     @Override
     protected void configure(AuthenticationManagerBuilder auth) throws Exception {
-        auth.userDetailsService(customUserDetailService);
+        auth.userDetailsService(userService);
     }
 
     @Bean

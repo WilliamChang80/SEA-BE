@@ -1,7 +1,8 @@
 package com.sea.be.demo.Filter;
 
-import com.sea.be.demo.Config.CustomUserDetailService;
+
 import com.sea.be.demo.Config.JwtUtil;
+import com.sea.be.demo.Service.UserService;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.security.authentication.UsernamePasswordAuthenticationToken;
 import org.springframework.security.core.context.SecurityContextHolder;
@@ -19,13 +20,13 @@ import java.io.IOException;
 @Component
 public class JwtRequestFilter extends OncePerRequestFilter {
 
-    private CustomUserDetailService userDetailService;
+    private UserService userService;
 
     private JwtUtil jwtUtil;
 
     @Autowired
-    public JwtRequestFilter(CustomUserDetailService userDetailService, JwtUtil jwtUtil) {
-        this.userDetailService = userDetailService;
+    public JwtRequestFilter(UserService userService, JwtUtil jwtUtil) {
+        this.userService = userService;
         this.jwtUtil = jwtUtil;
     }
 
@@ -42,11 +43,11 @@ public class JwtRequestFilter extends OncePerRequestFilter {
         }
         if (username != null && SecurityContextHolder.getContext().getAuthentication() == null) {
 
-            UserDetails userDetails = userDetailService.loadUserByUsername(username);
+            UserDetails userDetails = userService.loadUserByUsername(username);
 
             if (jwtUtil.validateToken(jwt, userDetails)) {
-
-                UsernamePasswordAuthenticationToken usernamePasswordAuthenticationToken = new UsernamePasswordAuthenticationToken(
+                UsernamePasswordAuthenticationToken usernamePasswordAuthenticationToken = new
+                        UsernamePasswordAuthenticationToken(
                         userDetails, null, userDetails.getAuthorities());
                 usernamePasswordAuthenticationToken
                         .setDetails(new WebAuthenticationDetailsSource().buildDetails(request));

@@ -6,26 +6,29 @@ import com.sea.be.demo.Entity.User;
 import com.sea.be.demo.Repository.UserRepository;
 import com.sea.be.demo.Service.UserService;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.security.core.userdetails.UserDetails;
+import org.springframework.security.core.userdetails.UsernameNotFoundException;
+import org.springframework.security.crypto.bcrypt.BCrypt;
 import org.springframework.security.crypto.bcrypt.BCryptPasswordEncoder;
+import org.springframework.security.crypto.password.PasswordEncoder;
 import org.springframework.stereotype.Service;
 
 import javax.persistence.EntityNotFoundException;
+import java.util.ArrayList;
 
 @Service
 public class UserServiceImpl implements UserService {
 
     UserRepository userRepository;
-    SecurityConfigurer securityConfigurer;
 
     @Autowired
-    public UserServiceImpl(UserRepository userRepository, SecurityConfigurer securityConfigurer) {
+    public UserServiceImpl(UserRepository userRepository) {
         this.userRepository = userRepository;
-        this.securityConfigurer = securityConfigurer;
     }
 
     @Override
     public void createUser(AuthenticationRequest request) {
-        String hashedPassword = new BCryptPasswordEncoder().encode(request.getPassword());
+        String hashedPassword = BCrypt.hashpw(request.getPassword(), BCrypt.gensalt(10));
         User user = User.builder().name(request.getUserName()).password(hashedPassword).build();
         userRepository.save(user);
     }
@@ -51,5 +54,21 @@ public class UserServiceImpl implements UserService {
     @Override
     public User getUserById(Long userId) {
         return userRepository.findById(userId).orElse(null);
+    }
+
+    @Override
+    public boolean isValidLoginCredentials(String userName, String password) {
+        User user = userRepository.getByNameEquals(userName);
+        if (user == null) {
+            return false;
+        }
+        return BCrypt.checkpw(password, user.getPassword());
+    }
+
+    @Override
+    public UserDetails loadUserByUsername(String userName) throws UsernameNotFoundException {
+        User user = userRepository.getByNameEquals(userName);
+        return new org.springframework.security.core.userdetails.User(user.getName(), user.getPassword(),
+                new ArrayList<>());
     }
 }
