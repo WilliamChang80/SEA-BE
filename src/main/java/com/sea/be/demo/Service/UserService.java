@@ -1,17 +1,24 @@
 package com.sea.be.demo.Service;
 
 import com.sea.be.demo.Dto.AuthenticationRequest;
+import com.sea.be.demo.Dto.UserResponse;
 import com.sea.be.demo.Entity.User;
 import org.springframework.security.core.userdetails.UserDetailsService;
+import org.springframework.web.multipart.MultipartFile;
+
+import java.io.IOException;
+import java.util.List;
 
 public interface UserService extends UserDetailsService {
-    public void createUser(AuthenticationRequest authenticationRequest);
+    void createUser(AuthenticationRequest authenticationRequest);
 
-    public void updateUser(AuthenticationRequest authenticationRequest, Long id) throws Exception;
+    void updateUser(AuthenticationRequest authenticationRequest, Long id) throws Exception;
 
-    public User getUserByUserName(String userName);
+    User getUserByUserName(String userName);
 
-    public User getUserById(Long userId);
+    User getUserById(Long userId);
 
-    public boolean isValidLoginCredentials(String userName, String password);
+    boolean isValidLoginCredentials(String userName, String password);
+
+    List<UserResponse> getAllUsers();
 }

@@ -2,7 +2,9 @@ package com.sea.be.demo.Service;
 
 import com.sea.be.demo.Dto.ItemRequest;
 import com.sea.be.demo.Entity.Item;
+import org.springframework.web.multipart.MultipartFile;
 
+import java.io.IOException;
 import java.util.List;
 
 public interface ItemService {

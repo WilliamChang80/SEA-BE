@@ -13,6 +13,9 @@ import org.springframework.security.authentication.BadCredentialsException;
 import org.springframework.security.authentication.UsernamePasswordAuthenticationToken;
 import org.springframework.security.core.userdetails.UserDetails;
 import org.springframework.web.bind.annotation.*;
+import org.springframework.web.multipart.MultipartFile;
+
+import java.io.IOException;
 
 @RestController
 @RequestMapping("/api/v1/auth")
@@ -64,26 +67,5 @@ public class AuthenticationController {
 
     private boolean usernameValid(String userName) {
         return userService.getUserByUserName(userName) == null;
-    }
-
-    private boolean updatedUsernameValid(String userName, Long userId) {
-        User user = userService.getUserById(userId);
-        if (userName != user.getName()) {
-            return userService.getUserByUserName(userName).getId() == userId;
-        }
-        return true;
-    }
-
-    @PutMapping("/update/{id}")
-    public BaseResponse updateUser(@RequestBody AuthenticationRequest authenticationRequest, @PathVariable Long id)
-            throws Exception {
-        if (!updatedUsernameValid(authenticationRequest.getUserName(), id)) {
-            return BaseResponse.builder().code(HttpResponse.UNPROCESSABLE_ENTITY.getCode()).message(
-                    "Username Already Taken!")
-                    .build();
-        }
-        userService.updateUser(authenticationRequest, id);
-        return BaseResponse.builder().code(HttpResponse.SUCCESS.getCode()).message("Success")
-                .build();
     }
 }
