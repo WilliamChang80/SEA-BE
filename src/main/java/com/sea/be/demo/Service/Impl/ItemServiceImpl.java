@@ -1,10 +1,14 @@
 package com.sea.be.demo.Service.Impl;
 
 import com.sea.be.demo.Dto.ItemRequest;
+import com.sea.be.demo.Dto.ItemResponse;
+import com.sea.be.demo.Dto.UserResponse;
 import com.sea.be.demo.Entity.Category;
 import com.sea.be.demo.Entity.Item;
+import com.sea.be.demo.Entity.User;
 import com.sea.be.demo.Repository.CategoryRepository;
 import com.sea.be.demo.Repository.ItemRepository;
+import com.sea.be.demo.Repository.UserRepository;
 import com.sea.be.demo.Service.ItemService;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
@@ -17,6 +21,7 @@ import java.nio.file.Path;
 import java.nio.file.Paths;
 import java.util.Date;
 import java.util.List;
+import java.util.stream.Collectors;
 
 @Service
 public class ItemServiceImpl implements ItemService {
@@ -25,10 +30,14 @@ public class ItemServiceImpl implements ItemService {
 
     private CategoryRepository categoryRepository;
 
+    private UserRepository userRepository;
+
     @Autowired
-    public ItemServiceImpl(ItemRepository itemRepository, CategoryRepository categoryRepository) {
+    public ItemServiceImpl(ItemRepository itemRepository, CategoryRepository categoryRepository,
+                           UserRepository userRepository) {
         this.itemRepository = itemRepository;
         this.categoryRepository = categoryRepository;
+        this.userRepository = userRepository;
     }
 
     @Override
@@ -61,29 +70,39 @@ public class ItemServiceImpl implements ItemService {
     }
 
     @Override
-    public List<Item> getAllItems() {
+    public List<ItemResponse>getAllItems() {
         List<Item> items = itemRepository.findAll();
-        return items;
+        List<ItemResponse> itemResponses = items.stream().map(this::convertItemToResponse).collect(Collectors.toList());
+        return itemResponses;
     }
 
     @Override
-    public List<Item> getItemsByUserId(Long userId) {
+    public List<ItemResponse> getItemsByUserId(Long userId) {
         List<Item> items = itemRepository.findAllByUserId(userId);
-        return items;
+        List<ItemResponse> itemResponses = items.stream().map(this::convertItemToResponse).collect(Collectors.toList());
+        return itemResponses;
     }
 
     @Override
-    public List<Item> getItemsByCategory(Long categoryId) {
+    public List<ItemResponse> getItemsByCategory(Long categoryId) {
         List<Item> items = itemRepository.findAllByCategoryId(categoryId);
-        return items;
+        List<ItemResponse> itemResponses = items.stream().map(this::convertItemToResponse).collect(Collectors.toList());
+        return itemResponses;
     }
 
     @Override
-    public Item getItemById(Long id) {
+    public ItemResponse getItemById(Long id) {
         Item item = itemRepository.findById(id).orElse(null);
         if (item == null) {
             throw new EntityNotFoundException("Item Not Found");
         }
-        return item;
+        return convertItemToResponse(item);
+    }
+
+    private ItemResponse convertItemToResponse(Item item) {
+        User user= userRepository.findById(item.getUserId()).orElse(null);
+        return ItemResponse.builder().id(item.getId()).category(item.getCategory()).description(item.getDescription())
+                .name(item.getName()).price(item.getPrice()).user(UserResponse.builder().id(user.getId())
+                        .username(user.getName()).build()).build();
     }
 }

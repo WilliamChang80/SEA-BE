@@ -4,6 +4,7 @@ import com.sea.be.demo.Config.JwtUtil;
 import com.sea.be.demo.Dto.AuthenticationRequest;
 import com.sea.be.demo.Dto.AuthenticationResponse;
 import com.sea.be.demo.Dto.BaseResponse;
+import com.sea.be.demo.Dto.UserResponse;
 import com.sea.be.demo.Entity.User;
 import com.sea.be.demo.Enum.HttpResponse;
 import com.sea.be.demo.Service.UserService;
@@ -47,9 +48,11 @@ public class AuthenticationController {
             return BaseResponse.builder().code(HttpResponse.UNAUTHORIZED.getCode()).message(e.getMessage()).build();
         }
         UserDetails userDetails = userService.loadUserByUsername(authenticationRequest.getUserName());
+        User user = userService.getUserByUserName(authenticationRequest.getUserName());
         String jwt = jwtUtil.generateToken(userDetails);
+        UserResponse userResponse = UserResponse.builder().id(user.getId()).username(user.getName()).build();
         BaseResponse response = BaseResponse.builder().code(HttpResponse.SUCCESS.getCode()).message("Success").data(
-                AuthenticationResponse.builder().token(jwt).build()).build();
+                AuthenticationResponse.builder().token(jwt).user(userResponse).build()).build();
         return response;
     }
 

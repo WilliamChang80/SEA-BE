@@ -8,5 +8,6 @@ import lombok.Getter;
 @AllArgsConstructor
 @Builder
 public class AuthenticationResponse {
-    private final String token;
+    private String token;
+    private UserResponse user;
 }

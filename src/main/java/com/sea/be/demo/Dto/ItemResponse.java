@@ -11,6 +11,9 @@ import lombok.NoArgsConstructor;
 @NoArgsConstructor
 @AllArgsConstructor
 public class ItemResponse {
+
+    private Long id;
+
     private String name;
 
     private String description;
@@ -19,5 +22,5 @@ public class ItemResponse {
 
     private Long price;
 
-    private String username;
+    private UserResponse user;
 }

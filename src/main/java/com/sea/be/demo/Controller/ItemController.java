@@ -2,6 +2,7 @@ package com.sea.be.demo.Controller;
 
 import com.sea.be.demo.Dto.BaseResponse;
 import com.sea.be.demo.Dto.ItemRequest;
+import com.sea.be.demo.Dto.ItemResponse;
 import com.sea.be.demo.Entity.Category;
 import com.sea.be.demo.Entity.Item;
 import com.sea.be.demo.Enum.HttpResponse;
@@ -16,6 +17,7 @@ import java.util.List;
 
 @RestController
 @RequestMapping("/api/v1")
+@CrossOrigin("http://localhost:3000")
 public class ItemController {
     private ItemService itemService;
 
@@ -44,25 +46,25 @@ public class ItemController {
 
     @GetMapping("/items")
     public BaseResponse getAllItems() {
-        List<Item> items = itemService.getAllItems();
+        List<ItemResponse> items = itemService.getAllItems();
         return BaseResponse.builder().code(HttpResponse.SUCCESS.getCode()).message("Success").data(items).build();
     }
 
     @GetMapping("/items/user/{userId}")
     public BaseResponse getItemsByUserId(@PathVariable Long userId) {
-        List<Item> items = itemService.getItemsByUserId(userId);
+        List<ItemResponse> items = itemService.getItemsByUserId(userId);
         return BaseResponse.builder().code(HttpResponse.SUCCESS.getCode()).message("Success").data(items).build();
     }
 
     @GetMapping("/items/category/{categoryId}")
     public BaseResponse getItemsByCategory(@PathVariable Long categoryId) {
-        List<Item> items = itemService.getItemsByCategory(categoryId);
+        List<ItemResponse> items = itemService.getItemsByCategory(categoryId);
         return BaseResponse.builder().code(HttpResponse.SUCCESS.getCode()).message("Success").data(items).build();
     }
 
     @GetMapping("/item/{id}")
     public BaseResponse getItemById(@PathVariable Long id) {
-        Item item = itemService.getItemById(id);
+        ItemResponse item = itemService.getItemById(id);
         return BaseResponse.builder().code(HttpResponse.SUCCESS.getCode()).message("Success").data(item).build();
     }
 }
