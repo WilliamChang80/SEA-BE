@@ -12,6 +12,7 @@ import com.sea.be.demo.Repository.UserRepository;
 import com.sea.be.demo.Service.ItemService;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
+import org.springframework.web.bind.annotation.RequestBody;
 import org.springframework.web.multipart.MultipartFile;
 
 import javax.persistence.EntityNotFoundException;
@@ -41,7 +42,7 @@ public class ItemServiceImpl implements ItemService {
     }
 
     @Override
-    public void createItem(ItemRequest itemRequest) {
+    public void createItem(@RequestBody ItemRequest itemRequest) {
         Category category = categoryRepository.findById(itemRequest.getCategoryId()).orElse(null);
         Item item = Item.builder().name(itemRequest.getName()).category(category).description(itemRequest.
                 getDescription()).price(itemRequest.getPrice()).userId(itemRequest.getUserId()).build();
@@ -49,7 +50,7 @@ public class ItemServiceImpl implements ItemService {
     }
 
     @Override
-    public void updateItem(ItemRequest itemRequest, Long id) {
+    public void updateItem(@RequestBody ItemRequest itemRequest, Long id) {
         Category category = categoryRepository.findById(itemRequest.getCategoryId()).orElse(null);
         Item item = itemRepository.findById(id).orElse(null);
         if (item == null) {

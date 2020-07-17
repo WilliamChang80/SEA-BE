@@ -16,8 +16,7 @@ import javax.persistence.EntityNotFoundException;
 import java.util.List;
 
 @RestController
-@RequestMapping("/api/v1")
-@CrossOrigin("http://localhost:3000")
+@RequestMapping("/v1")
 public class ItemController {
     private ItemService itemService;
 
