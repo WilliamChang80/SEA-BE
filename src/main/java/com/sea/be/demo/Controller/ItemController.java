@@ -16,7 +16,7 @@ import javax.persistence.EntityNotFoundException;
 import java.util.List;
 
 @RestController
-@RequestMapping("/v1")
+@RequestMapping("/api/v1")
 public class ItemController {
     private ItemService itemService;
 

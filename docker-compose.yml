@@ -23,6 +23,7 @@ services:
       - spring.datasource.username=postgres
       - spring.datasource.password=root
       - spring.jpa.hibernate.ddl-auto=update
+      - server.port=8080
     depends_on:
       - postgres
     networks:
@@ -34,7 +35,7 @@ services:
       context: .
       dockerfile: Dockerfile
     ports:
-      - 3000:3000
+      - 81:3000
     stdin_open: true
     networks:
       - java_network
