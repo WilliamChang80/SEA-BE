@@ -48,6 +48,12 @@ public class UserController {
                 .build();
     }
 
+    @GetMapping("/verify")
+    public BaseResponse verifyUser() {
+        return BaseResponse.builder().code(HttpResponse.SUCCESS.getCode()).message("Success")
+                .build();
+    }
+
     private boolean updatedUsernameValid(String userName, Long userId) {
         User user = userService.getUserById(userId);
         if (userName != user.getName()) {
