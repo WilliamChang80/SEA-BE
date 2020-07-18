@@ -2,6 +2,7 @@ package com.sea.be.demo.Service.Impl;
 
 import com.sea.be.demo.Config.SecurityConfigurer;
 import com.sea.be.demo.Dto.AuthenticationRequest;
+import com.sea.be.demo.Dto.UserRequest;
 import com.sea.be.demo.Dto.UserResponse;
 import com.sea.be.demo.Entity.User;
 import com.sea.be.demo.Repository.UserRepository;
@@ -43,12 +44,13 @@ public class UserServiceImpl implements UserService {
     }
 
     @Override
-    public void updateUser(AuthenticationRequest request, Long id) throws Exception {
-        String hashedPassword = new BCryptPasswordEncoder().encode(request.getPassword());
+    public void updateUser(UserRequest userRequest, Long id) throws Exception {
         try {
             User user = userRepository.findById(id).orElse(null);
-            user.setName(request.getUserName());
-            user.setPassword(hashedPassword);
+            String password = userRequest.getNewPassword() == null ? user.getPassword() : new
+                    BCryptPasswordEncoder().encode(userRequest.getNewPassword());
+            user.setName(userRequest.getNewUserName());
+            user.setPassword(password);
             userRepository.save(user);
         } catch (EntityNotFoundException e) {
             throw new Exception("User Not Found!", e);

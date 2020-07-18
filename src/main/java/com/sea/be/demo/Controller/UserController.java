@@ -2,6 +2,7 @@ package com.sea.be.demo.Controller;
 
 import com.sea.be.demo.Dto.AuthenticationRequest;
 import com.sea.be.demo.Dto.BaseResponse;
+import com.sea.be.demo.Dto.UserRequest;
 import com.sea.be.demo.Dto.UserResponse;
 import com.sea.be.demo.Entity.User;
 import com.sea.be.demo.Enum.HttpResponse;
@@ -22,15 +23,20 @@ public class UserController {
         this.userService = userService;
     }
 
-    @PutMapping("/user/update/{id}")
-    public BaseResponse updateUser(@RequestBody AuthenticationRequest authenticationRequest, @PathVariable Long id)
+    @PutMapping("/user/{id}")
+    public BaseResponse updateUser(@RequestBody UserRequest userRequest, @PathVariable Long id)
             throws Exception {
-        if (!updatedUsernameValid(authenticationRequest.getUserName(), id)) {
+        if (!userService.isValidLoginCredentials(userRequest.getOldUserName(), userRequest.getOldPassword())) {
+            return BaseResponse.builder().code(HttpResponse.UNAUTHORIZED.getCode()).message(
+                    "Username and Password Did not Match!")
+                    .build();
+        }
+        if (!updatedUsernameValid(userRequest.getNewUserName(), id)) {
             return BaseResponse.builder().code(HttpResponse.UNPROCESSABLE_ENTITY.getCode()).message(
                     "Username Already Taken!")
                     .build();
         }
-        userService.updateUser(authenticationRequest, id);
+        userService.updateUser(userRequest, id);
         return BaseResponse.builder().code(HttpResponse.SUCCESS.getCode()).message("Success")
                 .build();
     }
@@ -46,7 +52,7 @@ public class UserController {
         User user = userService.getUserById(userId);
         if (userName != user.getName()) {
             User userTemp = userService.getUserByUserName(userName);
-            if(userTemp == null || userTemp.getId() == userId) {
+            if (userTemp == null || userTemp.getId() == userId) {
                 return true;
             }
             return false;

@@ -23,7 +23,6 @@ public class Item extends BaseEntity{
 
     private String description;
 
-    @Cascade(CascadeType.ALL)
     @OneToOne
     private Category category;
 
