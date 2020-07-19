@@ -1,57 +1,13 @@
 version: "2.2"
 services:
-  postgres:
-    container_name: postgres
-    image: postgres
-    restart: always
-    environment:
-      - POSTGRES_PASSWORD=root
-      - POSTGRES_DB=sea
-    volumes:
-      - ./postgres:/var/lib/postgresql/data
-    ports:
-      - 5432:5432
-    networks:
-      - java_network
   sea-be:
     container_name: sea-be
     ports:
       - 8080:8080
     image: williamchang80/sea-be:1.1
     environment:
-      - spring.datasource.url=jdbc:postgresql://postgres:5432/sea
-      - spring.datasource.username=postgres
-      - spring.datasource.password=root
+      - spring.datasource.url = jdbc:postgresql://ec2-35-172-73-125.compute-1.amazonaws.com:5432/d2l98gcp99os27
+      - spring.datasource.username=qxheljilxrktlw
+      - spring.datasource.password=4cd2a97e1cde8656d790e36e587be10109ee58aac9c72d5f765291b06b0dfab3
       - spring.jpa.hibernate.ddl-auto=update
       - server.port=8080
-    depends_on:
-      - postgres
-    networks:
-      - java_network
-  sea-fe:
-    container_name: sea-fe
-    image: williamchang80/sea-fe:1.1
-    build:
-      context: .
-      dockerfile: Dockerfile
-    ports:
-      - 81:3000
-    stdin_open: true
-    networks:
-      - java_network
-  proxy:
-    container_name: proxy
-    image: proxy:1.0
-    ports:
-      - 80:80
-    depends_on:
-      - sea-be
-      - sea-fe
-    environment:
-      - NGINX_PORT=80
-    networks:
-      - java_network
-
-networks:
-  java_network:
-    name: java_network
